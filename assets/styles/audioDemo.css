@@ -1,0 +1,49 @@
+.dplayer-container {
+	position: relative;
+	box-sizing: border-box;
+	margin: 0 auto;
+	padding: 2rem 0;
+	border-radius: 5px;
+	box-shadow: 0 0 5px #ccc;
+	width: 100%;
+}
+
+.dplayBtn {
+	position: absolute;
+	top: 0;
+	width: 4rem;
+}
+.dplayBtn img{
+	cursor: pointer;
+}
+
+.dplayer-bar {
+	box-sizing: border-box;
+    margin-left: 4.5rem;
+    margin-right: 6.5rem;
+    height: 2px;
+    background: #ddd;
+}
+.dplayer-bar .dplayer-loaded {
+	height: 2px;
+	background: #ff8345;
+}
+.dplayer-bar .dplayer-played {
+	position: relative;
+	top: -.3rem;
+	box-sizing: border-box;
+    border-radius: 50%;
+    border: 1px solid #ff8345;
+    background: #fff;
+	width: .6rem;
+	height: .6rem;
+	cursor: pointer;
+}
+
+.dplayer-time {
+	position: absolute;
+	top: 1.5rem;
+	right: 0;
+	width: 6rem;
+	color: #aaa;
+}
