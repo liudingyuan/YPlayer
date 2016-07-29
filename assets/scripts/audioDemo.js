@@ -1,3 +1,7 @@
+var devWidth = document.documentElement.clientWidth;
+if ( devWidth > 640 ){ devWidth = 640;}
+document.documentElement.style.fontSize = devWidth / (750 / 100) + 'px';
+
 var config = {
 	el: document.querySelector('#player'),
 	music: {
@@ -54,7 +58,7 @@ function DPlayer(config) {
                                  '<div class="dplayer-loaded" style="width: 0;"></div>' +
                                  '<div class="dplayer-played"><span class="dplayer-thumb"></span></div>' +   
                             '</div>' +
-                            '<div class="dplayer-time"><span class="dplayer-sTime">-00:00</span>&#47;<span class="dplayer-etime">00:00</span></div>' +
+                            '<div class="dplayer-time"><span class="dplayer-sTime">00:00</span>&#47;<span class="dplayer-etime">00:00</span></div>' +
     	                    '<audio src="' + config.music.url + '"></audio>' +	
                             '</div>';
         config.el.innerHTML = viewHtml;
