@@ -18,16 +18,19 @@ function DPlayer(config) {
     	}
     },
     methods = {
-    	formatTime: function (audioObj, currTime, allTime) {
-    		var duration = audioObj.duration,
-                min = parseInt(duration / 60, 10),
-    		    sec = parseInt(duration % 60, 10);
-            allTime.innerHTML = min + ':' + sec;
+    	formatTime: function (time, target) {
+            var min = parseInt(time / 60, 10),
+    		    sec = parseInt(time % 60, 10);
 
-            audioObj.addEventListener('timeupdate', function () {
-               //
-            }, false);
+            min = min < 10 ? '0' + min : min;
+            sec = sec < 10 ? '0' + sec : sec;
+            target.innerHTML = min + ':' + sec;
     	},
+        setCurrTime: function (audioObj, target) {
+            audioObj.addEventListener('timeupdate', function () {
+                methods.formatTime(audioObj.currentTime, target);
+            }, false);
+        },
         setFeedback: function (audioObj, loadedBar, progressBar) {
             audioObj.addEventListener('progress', function () {
                 var bufferedEnd = audioObj.buffered.end(audioObj.buffered.length - 1),
@@ -78,7 +81,8 @@ function DPlayer(config) {
         };
 
         audio.onloadedmetadata = function () {
-            methods.formatTime(audio, allTimeText, currTimeText);
+            methods.formatTime(audio.duration, allTimeText);
+            methods.setCurrTime(audio, currTimeText);
             methods.setFeedback(audio, loadedBar, progressBar);
         };
 	};
