@@ -4,12 +4,13 @@ document.documentElement.style.fontSize = devWidth / (750 / 100) + 'px';
 
 var config = {
 	el: document.querySelector('#player'),
+    preload: 'metadata',                       //加载方式：包含原生属性none,metadata,auto和click点击播放按钮开始加载
 	music: {
 		url: './song.mp3'
 	}
 };
 
-function DPlayer(config) {
+function YPlayer(config) {
     var setting = {
     	isplay: false,
     	playIcon: './assets/imgs/play.svg',
@@ -22,6 +23,8 @@ function DPlayer(config) {
     	}
     },
     methods = {
+
+        //格式化时间 eg: 00:00
     	formatTime: function (time, target) {
             var min = parseInt(time / 60, 10),
     		    sec = parseInt(time % 60, 10);
@@ -30,11 +33,15 @@ function DPlayer(config) {
             sec = sec < 10 ? '0' + sec : sec;
             target.innerHTML = min + ':' + sec;
     	},
+
+        //设置当前播放时间
         setCurrTime: function (audioObj, target) {
             audioObj.addEventListener('timeupdate', function () {
                 methods.formatTime(audioObj.currentTime, target);
             }, false);
         },
+
+        //设置进度条，包含加载进度条和播放进度
         setFeedback: function (audioObj, loadedBar, progressBar) {
             audioObj.addEventListener('progress', function () {
                 var bufferedEnd = audioObj.buffered.end(audioObj.buffered.length - 1),
@@ -46,30 +53,41 @@ function DPlayer(config) {
                 var duration = audioObj.duration;
                 progressBar.style.left = audioObj.currentTime / duration * 100 + '%';
             }, false);     
+        },
+
+        //初始化加载方式
+        initPreload: function (audioObj, config, btnTarget) {
+            if (config.preload !== 'click') {
+                audioObj.preload = config.preload;
+            }
+            else {
+                audioObj.preload = 'none';
+                btnTarget.onclick = function () {audioObj.preload = 'auto'};
+            }
         }
     };
 
 	this.init = function () {
-		var viewHtml = '<div class="dplayer-container">' +
-                            '<div class="dplayBtn">' +
+		var viewHtml = '<div class="yplayer-container">' +
+                            '<div class="yplayBtn">' +
         	                     '<img src="' + setting.playIcon + '" width="100%"></img>' +
                             '</div>' +
-                            '<div class="dplayer-bar">' +
-                                 '<div class="dplayer-loaded" style="width: 0;"></div>' +
-                                 '<div class="dplayer-played"><span class="dplayer-thumb"></span></div>' +   
+                            '<div class="yplayer-bar">' +
+                                 '<div class="yplayer-loaded" style="width: 0;"></div>' +
+                                 '<div class="yplayer-played"><span class="yplayer-thumb"></span></div>' +   
                             '</div>' +
-                            '<div class="dplayer-time"><span class="dplayer-sTime">00:00</span>&#47;<span class="dplayer-etime">00:00</span></div>' +
+                            '<div class="yplayer-time"><span class="yplayer-sTime">00:00</span>&#47;<span class="yplayer-etime">00:00</span></div>' +
     	                    '<audio src="' + config.music.url + '"></audio>' +	
                             '</div>';
         config.el.innerHTML = viewHtml;
 
         var audio = tool.$('audio', setting.el),
-            playBtn = tool.$('.dplayBtn', setting.el),
+            playBtn = tool.$('.yplayBtn', setting.el),
             playIcon = tool.$('img', playBtn),
-            currTimeText = tool.$('.dplayer-sTime'),
-            allTimeText = tool.$('.dplayer-etime'),
-            loadedBar = tool.$('.dplayer-loaded'),
-            progressBar = tool.$('.dplayer-played');
+            currTimeText = tool.$('.yplayer-sTime'),
+            allTimeText = tool.$('.yplayer-etime'),
+            loadedBar = tool.$('.yplayer-loaded'),
+            progressBar = tool.$('.yplayer-played');
 
         playBtn.onclick = function () {
         	setting.isplay = !setting.isplay;
@@ -84,6 +102,8 @@ function DPlayer(config) {
         	}
         };
 
+        methods.initPreload(audio, config, playBtn);
+
         audio.onloadedmetadata = function () {
             methods.formatTime(audio.duration, allTimeText);
             methods.setCurrTime(audio, currTimeText);
@@ -92,5 +112,5 @@ function DPlayer(config) {
 	};
 }
 
-var app = new DPlayer(config);
+var app = new YPlayer(config);
 app.init();
