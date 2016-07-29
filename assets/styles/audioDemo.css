@@ -23,6 +23,7 @@
     margin-right: 2rem;
     height: 2px;
     background: #ddd;
+    cursor: pointer;
 }
 .yplayer-bar .yplayer-loaded {
 	height: 2px;

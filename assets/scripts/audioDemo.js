@@ -42,7 +42,8 @@ function YPlayer(config) {
         },
 
         //设置进度条，包含加载进度条和播放进度
-        setFeedback: function (audioObj, loadedBar, progressBar) {
+        setFeedback: function (audioObj, loadedBar, progressBtn) {
+            
             audioObj.addEventListener('progress', function () {
                 var bufferedEnd = audioObj.buffered.end(audioObj.buffered.length - 1),
                     duration = audioObj.duration;
@@ -51,7 +52,7 @@ function YPlayer(config) {
 
             audioObj.addEventListener('timeupdate', function () {
                 var duration = audioObj.duration;
-                progressBar.style.left = audioObj.currentTime / duration * 100 + '%';
+                progressBtn.style.left = audioObj.currentTime / duration * 100 + '%';
             }, false);     
         },
 
@@ -64,6 +65,54 @@ function YPlayer(config) {
                 audioObj.preload = 'none';
                 btnTarget.onclick = function () {audioObj.preload = 'auto'};
             }
+        },
+
+        //进度条点击控制跳跃播放
+        playedBarContro: function (e, audioObj, playedBarObj) {
+            
+            if (e.target.className !== 'yplayer-played') {
+                var clickX = e.offsetX,
+                duration = audioObj.duration,
+                present = clickX / playedBarObj.clientWidth;
+
+                audioObj.currentTime = duration * present;
+            }  
+        },
+
+        //进度条按钮拖放控制
+        dragThumb: function (audioObj, progressBtn, playedBarObj) {
+            var canMove = false,
+                audio = audioObj;
+                // console.log(audio);
+            
+            progressBtn.addEventListener('mousedown', function () {
+                // console.log('mousedown');
+                canMove = true;
+            });
+            progressBtn.addEventListener('mousemove', function (e) {
+                
+                if (canMove === true) {
+                    var currentX = parseFloat(e.target.style.left),
+                        difX = (e.offsetX - e.target.clientWidth / 2) / playedBarObj.clientWidth * 100,
+                        changeX = currentX + difX,
+                        duration = audio.duration;
+
+                    changeX = changeX < 0 ? -changeX : changeX;
+                    e.target.style.left = changeX + '%';
+                    
+                    var currentTime = changeX / 100 * duration; 
+                    audioObj.currentTime = currentTime;
+                    // console.log(currentTime);
+
+                }
+            });
+            progressBtn.addEventListener('mouseup', function () {
+                // console.log('mouseup');
+                canMove = false;
+            });
+            progressBtn.addEventListener('mouseleave', function () {
+                canMove = false;
+            });
         }
     };
 
@@ -74,7 +123,7 @@ function YPlayer(config) {
                             '</div>' +
                             '<div class="yplayer-bar">' +
                                  '<div class="yplayer-loaded" style="width: 0;"></div>' +
-                                 '<div class="yplayer-played"><span class="yplayer-thumb"></span></div>' +   
+                                 '<div class="yplayer-played" style="left: 0%;"><span class="yplayer-thumb"></span></div>' +   
                             '</div>' +
                             '<div class="yplayer-time"><span class="yplayer-sTime">00:00</span>&#47;<span class="yplayer-etime">00:00</span></div>' +
     	                    '<audio src="' + config.music.url + '"></audio>' +	
@@ -86,8 +135,9 @@ function YPlayer(config) {
             playIcon = tool.$('img', playBtn),
             currTimeText = tool.$('.yplayer-sTime'),
             allTimeText = tool.$('.yplayer-etime'),
+            playedBar = tool.$('.yplayer-bar'),
             loadedBar = tool.$('.yplayer-loaded'),
-            progressBar = tool.$('.yplayer-played');
+            progressBtn = tool.$('.yplayer-played');
 
         playBtn.onclick = function () {
         	setting.isplay = !setting.isplay;
@@ -102,12 +152,17 @@ function YPlayer(config) {
         	}
         };
 
-        methods.initPreload(audio, config, playBtn);
+        // methods.initPreload(audio, config, playBtn);
+        audio.preload = config.preload
+
+        playedBar.addEventListener('click', function (e) {methods.playedBarContro(e, audio, playedBar);});
+        methods.dragThumb(audio, progressBtn, playedBar);
 
         audio.onloadedmetadata = function () {
             methods.formatTime(audio.duration, allTimeText);
             methods.setCurrTime(audio, currTimeText);
-            methods.setFeedback(audio, loadedBar, progressBar);
+            methods.setFeedback(audio, loadedBar, progressBtn);
+            
         };
 	};
 }
