@@ -6,7 +6,8 @@ var config = {
 	el: document.querySelector('#player'),
     preload: 'metadata',                       //加载方式：包含原生属性none,metadata,auto和click点击播放按钮开始加载
 	music: {
-		url: './song.mp3'
+		// url: './song.mp3'
+        url: 'http://7xsthh.com1.z0.glb.clouddn.com/song.mp3'
 	}
 };
 
@@ -20,7 +21,19 @@ function YPlayer(config) {
     	$: function (selector, context) {
     		var o = context || document;
     		return o.querySelector(selector);
-    	}
+    	},
+
+        //获取元素绝对位置的横坐标
+        getElementLeft: function (element) {
+            var actualLeft = element.offsetLeft,
+                current = element.offsetParent;
+
+            while (current !== null) {
+                actualLeft += current.offsetLeft;
+                current = current.offsetParent;
+            }
+            return actualLeft;
+        }
     },
     methods = {
 
@@ -47,12 +60,18 @@ function YPlayer(config) {
             audioObj.addEventListener('progress', function () {
                 var bufferedEnd = audioObj.buffered.end(audioObj.buffered.length - 1),
                     duration = audioObj.duration;
+
                 loadedBar.style.width = bufferedEnd / duration * 100 + '%';
+                console.log(bufferedEnd);
             }, false);
+                
 
             audioObj.addEventListener('timeupdate', function () {
-                var duration = audioObj.duration;
-                progressBtn.style.left = audioObj.currentTime / duration * 100 + '%';
+                var duration = audioObj.duration,
+                    currentX = audioObj.currentTime / duration * 100;
+
+                currentX = currentX > 99 ? 99 : currentX;
+                progressBtn.style.left = currentX + '%';
             }, false);     
         },
 
@@ -70,7 +89,7 @@ function YPlayer(config) {
         //进度条点击控制跳跃播放
         playedBarContro: function (e, audioObj, playedBarObj) {
             
-            if (e.target.className !== 'yplayer-played') {
+            if (e.target.className.indexOf('yplayer-played') === -1) {
                 var clickX = e.offsetX,
                 duration = audioObj.duration,
                 present = clickX / playedBarObj.clientWidth;
@@ -80,39 +99,34 @@ function YPlayer(config) {
         },
 
         //进度条按钮拖放控制
-        dragThumb: function (audioObj, progressBtn, playedBarObj) {
-            var canMove = false,
-                audio = audioObj;
-                // console.log(audio);
+        dragBar: function (audioObj, playedBarObj) {
+            var audio = audioObj,
+                diffX = 0,
+                dragging = null;
             
-            progressBtn.addEventListener('mousedown', function () {
-                // console.log('mousedown');
-                canMove = true;
+            document.addEventListener('mousedown', function (e) {
+                if (e.target.className.indexOf('draggable') > -1) {
+                    dragging = e.target;
+                    diffX = tool.getElementLeft(playedBarObj) + e.offsetX;
+                }
             });
-            progressBtn.addEventListener('mousemove', function (e) {
+            document.addEventListener('mousemove', function (e) {
                 
-                if (canMove === true) {
-                    var currentX = parseFloat(e.target.style.left),
-                        difX = (e.offsetX - e.target.clientWidth / 2) / playedBarObj.clientWidth * 100,
-                        changeX = currentX + difX,
-                        duration = audio.duration;
+                if (dragging !== null) {
+                    var actualX = e.clientX - diffX,
+                        percent = actualX / playedBarObj.clientWidth * 100;
 
-                    changeX = changeX < 0 ? -changeX : changeX;
-                    e.target.style.left = changeX + '%';
-                    
-                    var currentTime = changeX / 100 * duration; 
-                    audioObj.currentTime = currentTime;
-                    // console.log(currentTime);
+                    // if (percent < 0) {percent = 0;}
+                    // else if (percent > 99) {percent = 99;}
+    
+                    dragging.style.left = percent + '%';
+                    audio.currentTime = percent / 100 * audio.duration;
 
                 }
             });
-            progressBtn.addEventListener('mouseup', function () {
-                // console.log('mouseup');
-                canMove = false;
-            });
-            progressBtn.addEventListener('mouseleave', function () {
-                canMove = false;
-            });
+            document.addEventListener('mouseup', function () {
+                dragging = null;
+            })
         }
     };
 
@@ -123,7 +137,7 @@ function YPlayer(config) {
                             '</div>' +
                             '<div class="yplayer-bar">' +
                                  '<div class="yplayer-loaded" style="width: 0;"></div>' +
-                                 '<div class="yplayer-played" style="left: 0%;"><span class="yplayer-thumb"></span></div>' +   
+                                 '<div class="yplayer-played draggable" style="left: 0%;"><span class="yplayer-thumb"></span></div>' +   
                             '</div>' +
                             '<div class="yplayer-time"><span class="yplayer-sTime">00:00</span>&#47;<span class="yplayer-etime">00:00</span></div>' +
     	                    '<audio src="' + config.music.url + '"></audio>' +	
@@ -155,14 +169,14 @@ function YPlayer(config) {
         // methods.initPreload(audio, config, playBtn);
         audio.preload = config.preload
 
-        playedBar.addEventListener('click', function (e) {methods.playedBarContro(e, audio, playedBar);});
-        methods.dragThumb(audio, progressBtn, playedBar);
+        
 
         audio.onloadedmetadata = function () {
             methods.formatTime(audio.duration, allTimeText);
             methods.setCurrTime(audio, currTimeText);
             methods.setFeedback(audio, loadedBar, progressBtn);
-            
+            playedBar.addEventListener('click', function (e) {methods.playedBarContro(e, audio, playedBar);});
+            methods.dragBar(audio, playedBar);
         };
 	};
 }
