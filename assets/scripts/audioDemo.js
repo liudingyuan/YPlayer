@@ -4,7 +4,7 @@ document.documentElement.style.fontSize = devWidth / (750 / 100) + 'px';
 
 var config = {
 	el: document.querySelector('#player'),
-    preload: 'metadata',                       //加载方式：包含原生属性none,metadata,auto和click点击播放按钮开始加载
+    preload: 'metadata',                
 	music: {
 		url: './song.mp3'
         // url: 'http://7xsthh.com1.z0.glb.clouddn.com/song.mp3'
@@ -23,24 +23,6 @@ function YPlayer(config) {
     		var o = context || document;
     		return o.querySelector(selector);
     	},
-        tap: function (element, fn, args) {
-            var startTx,startTy;
-            element.addEventListener('touchstart', function (e) {
-                var touches = e.touches[0];
-                startTx = touches.clientX;
-                startTy = touches.clientY;
-            }, false);
-
-            element.addEventListener('touchend', function (e) {
-                var touches = e.changedTouches[0],
-                    endTx = touches.clientX,
-                    endTy = touches.clientY;
-
-                if (Math.abs(startTx - endTx) < 6 && Math.abs(startTy - endTy) < 6) {
-                    fn(e, args);
-                }
-            }, false);
-        },
 
         //获取元素绝对位置的横坐标
         getElementLeft: function (element) {
@@ -96,7 +78,6 @@ function YPlayer(config) {
                     duration = audioObj.duration;
 
                 loadedBar.style.width = bufferedEnd / duration * 100 + '%';
-                console.log(bufferedEnd);
             }, false);
                 
 
@@ -109,20 +90,9 @@ function YPlayer(config) {
             }, false);     
         },
 
-        //初始化加载方式
-        initPreload: function (audioObj, config, btnTarget) {
-            if (config.preload !== 'click') {
-                audioObj.preload = config.preload;
-            }
-            else {
-                audioObj.preload = 'none';
-                btnTarget.onclick = function () {audioObj.preload = 'auto'};
-            }
-        },
-
         //进度条点击控制跳跃播放
         playedBarContro: function (e, audioObj, playedBarObj) {
-            console.log(e);
+
             if (e.target.className.indexOf('yplayer-played') === -1) {
                 var clickX = e.offsetX,
                 duration = audioObj.duration,
@@ -227,13 +197,14 @@ function YPlayer(config) {
 
         audio.preload = config.preload
 
-        audio.onloadedmetadata = function () {
+        audio.addEventListener('canplay', function () {
             methods.formatTime(audio.duration, allTimeText);
             methods.setCurrTime(audio, currTimeText);
             methods.setFeedback(audio, loadedBar, progressBtn);
             playedBar.addEventListener('click', function (e) {methods.playedBarContro(e, audio, playedBar);});
             methods.dragBar(audio, playedBar, progressBtn);
-        };
+        }, false);
+
 	};
 }
 
