@@ -6,8 +6,8 @@ var config = {
 	el: document.querySelector('#player'),
     preload: 'metadata',                       //加载方式：包含原生属性none,metadata,auto和click点击播放按钮开始加载
 	music: {
-		// url: './song.mp3'
-        url: 'http://7xsthh.com1.z0.glb.clouddn.com/song.mp3'
+		url: './song.mp3'
+        // url: 'http://7xsthh.com1.z0.glb.clouddn.com/song.mp3'
 	}
 };
 
@@ -15,13 +15,32 @@ function YPlayer(config) {
     var setting = {
     	isplay: false,
     	playIcon: './assets/imgs/play.svg',
-    	pauseIcon: './assets/imgs/pause.svg'
+    	pauseIcon: './assets/imgs/pause.svg',
+        isMobile: false
     },
     tool = {
     	$: function (selector, context) {
     		var o = context || document;
     		return o.querySelector(selector);
     	},
+        tap: function (element, fn, args) {
+            var startTx,startTy;
+            element.addEventListener('touchstart', function (e) {
+                var touches = e.touches[0];
+                startTx = touches.clientX;
+                startTy = touches.clientY;
+            }, false);
+
+            element.addEventListener('touchend', function (e) {
+                var touches = e.changedTouches[0],
+                    endTx = touches.clientX,
+                    endTy = touches.clientY;
+
+                if (Math.abs(startTx - endTx) < 6 && Math.abs(startTy - endTy) < 6) {
+                    fn(e, args);
+                }
+            }, false);
+        },
 
         //获取元素绝对位置的横坐标
         getElementLeft: function (element) {
@@ -33,6 +52,21 @@ function YPlayer(config) {
                 current = current.offsetParent;
             }
             return actualLeft;
+        },
+
+        //限制拖动按钮移动界限0-100
+        limitX: function (number) {
+            var num = number;
+
+            if (num < 0) {num = 0;}
+            else if (num > 100) {num = 100;}
+
+            return num;
+        },
+
+        //判断是移动端还是PC端
+        isMobile: function () {
+            return !!navigator.userAgent.match(/AppleWebKit.*Mobile.*/);
         }
     },
     methods = {
@@ -70,7 +104,7 @@ function YPlayer(config) {
                 var duration = audioObj.duration,
                     currentX = audioObj.currentTime / duration * 100;
 
-                currentX = currentX > 99 ? 99 : currentX;
+                currentX = tool.limitX(currentX);
                 progressBtn.style.left = currentX + '%';
             }, false);     
         },
@@ -88,7 +122,7 @@ function YPlayer(config) {
 
         //进度条点击控制跳跃播放
         playedBarContro: function (e, audioObj, playedBarObj) {
-            
+            console.log(e);
             if (e.target.className.indexOf('yplayer-played') === -1) {
                 var clickX = e.offsetX,
                 duration = audioObj.duration,
@@ -99,34 +133,57 @@ function YPlayer(config) {
         },
 
         //进度条按钮拖放控制
-        dragBar: function (audioObj, playedBarObj) {
+        dragBar: function (audioObj, playedBarObj, progressBtn) {
             var audio = audioObj,
                 diffX = 0,
                 dragging = null;
-            
-            document.addEventListener('mousedown', function (e) {
-                if (e.target.className.indexOf('draggable') > -1) {
-                    dragging = e.target;
-                    diffX = tool.getElementLeft(playedBarObj) + e.offsetX;
-                }
-            });
-            document.addEventListener('mousemove', function (e) {
-                
-                if (dragging !== null) {
-                    var actualX = e.clientX - diffX,
-                        percent = actualX / playedBarObj.clientWidth * 100;
+            if (setting.isMobile) {
+                progressBtn.addEventListener('touchstart', function (e) {
+                    e.preventDefault();
+                    if (e.target.className.indexOf('draggable') > -1) {
+                        dragging = e.target;
+                        diffX = tool.getElementLeft(playedBarObj);
+                        // console.dir(e.touches[0]);
+                    }
+                    
+                }, false);
+                progressBtn.addEventListener('touchmove', function (e) {
+                    if (dragging !== null) {
+                        var actualX = e.touches[0].clientX - diffX,
+                            percent = actualX / playedBarObj.clientWidth * 100;
+                        
+                        percent = tool.limitX(percent);
+                        dragging.style.left = percent + '%';
+                        audio.currentTime = percent / 100 * audio.duration;
+                    }
+                }, false);
+                progressBtn.addEventListener('touchend', function (e) {
+                   dragging = null;
+                }, false);
+            }
+            else {
+                document.addEventListener('mousedown', function (e) {
+                    if (e.target.className.indexOf('draggable') > -1) {
+                        dragging = e.target;
+                        diffX = tool.getElementLeft(playedBarObj) + e.offsetX;
+                    }
+                }, false);
+                document.addEventListener('mousemove', function (e) {
+                    
+                    if (dragging !== null) {
+                        var actualX = e.clientX - diffX,
+                            percent = actualX / playedBarObj.clientWidth * 100;
 
-                    // if (percent < 0) {percent = 0;}
-                    // else if (percent > 99) {percent = 99;}
-    
-                    dragging.style.left = percent + '%';
-                    audio.currentTime = percent / 100 * audio.duration;
+                        percent = tool.limitX(percent);
+                        dragging.style.left = percent + '%';
+                        audio.currentTime = percent / 100 * audio.duration;
 
-                }
-            });
-            document.addEventListener('mouseup', function () {
-                dragging = null;
-            })
+                    }
+                }, false);
+                document.addEventListener('mouseup', function () {
+                    dragging = null;
+                }, false)
+            }
         }
     };
 
@@ -153,6 +210,8 @@ function YPlayer(config) {
             loadedBar = tool.$('.yplayer-loaded'),
             progressBtn = tool.$('.yplayer-played');
 
+        setting.isMobile = tool.isMobile();
+
         playBtn.onclick = function () {
         	setting.isplay = !setting.isplay;
 
@@ -166,17 +225,14 @@ function YPlayer(config) {
         	}
         };
 
-        // methods.initPreload(audio, config, playBtn);
         audio.preload = config.preload
-
-        
 
         audio.onloadedmetadata = function () {
             methods.formatTime(audio.duration, allTimeText);
             methods.setCurrTime(audio, currTimeText);
             methods.setFeedback(audio, loadedBar, progressBtn);
             playedBar.addEventListener('click', function (e) {methods.playedBarContro(e, audio, playedBar);});
-            methods.dragBar(audio, playedBar);
+            methods.dragBar(audio, playedBar, progressBtn);
         };
 	};
 }

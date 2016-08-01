@@ -38,7 +38,6 @@
     background: #fff;
 	width: .3rem;
 	height: .3rem;
-	z-index: 1;
 	cursor: pointer;
 }
 
@@ -46,6 +45,7 @@
 	position: absolute;
 	top: .3rem;
 	right: 0;
+	margin-left: .3rem
 	width: 2rem;
 	text-align: center;
 	font-size: .3rem;
