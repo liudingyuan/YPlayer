@@ -1,16 +1,3 @@
-var devWidth = document.documentElement.clientWidth;
-if ( devWidth > 640 ){ devWidth = 640;}
-document.documentElement.style.fontSize = devWidth / (750 / 100) + 'px';
-
-var config = {
-	el: document.querySelector('#player'),
-    preload: 'metadata',                
-	music: {
-		url: './song.mp3'
-        // url: 'http://7xsthh.com1.z0.glb.clouddn.com/song.mp3'
-	}
-};
-
 function YPlayer(config) {
     var setting = {
     	isplay: false,
@@ -78,7 +65,6 @@ function YPlayer(config) {
                 loadedBar.style.width = percentage * 100 + '%';
                 document.querySelector('#test').innerHTML = percentage;
             }, false);
-                
 
             audioObj.addEventListener('timeupdate', function () {
                 var duration = audioObj.duration,
@@ -200,8 +186,15 @@ function YPlayer(config) {
         playedBar.addEventListener('click', function (e) {methods.playedBarContro(e, audio, playedBar);});
         methods.dragBar(audio, playedBar, progressBtn);
 
+
+        audio.addEventListener('waiting', function () {
+            progressBtn.className += ' loaded';
+        }, false)
+
+        audio.addEventListener('canplay', function () {
+            progressBtn.className = 'yplayer-played draggable';
+            console.log('canplay');
+        }, false)
+
 	};
 }
-
-var app = new YPlayer(config);
-app.init();

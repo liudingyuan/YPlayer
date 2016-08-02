@@ -10,5 +10,22 @@
     <div id="player"></div>
     <p style="font-size: .3rem;">loadedBar percentage: <span id="test"></span></p>
     <script src="./assets/scripts/audioDemo.js"></script>
+    <script>
+    	var devWidth = document.documentElement.clientWidth;
+        if ( devWidth > 640 ){ devWidth = 640;}
+        document.documentElement.style.fontSize = devWidth / (750 / 100) + 'px';
+
+        var config = {
+        	el: document.querySelector('#player'),
+            preload: 'metadata',                
+        	music: {
+        		url: './song.mp3'
+                // url: 'http://7xsthh.com1.z0.glb.clouddn.com/song.mp3'
+        	}
+        };
+
+        var app = new YPlayer(config);
+        app.init();
+    </script>
 </body>
 </html>
