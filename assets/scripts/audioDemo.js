@@ -73,19 +73,16 @@ function YPlayer(config) {
         //设置进度条，包含加载进度条和播放进度
         setFeedback: function (audioObj, loadedBar, progressBtn) {
             
-            audioObj.addEventListener('progress', function () {
-                var bufferedEnd = audioObj.buffered.end(audioObj.buffered.length - 1),
-                    duration = audioObj.duration;
-
-                loadedBar.style.width = bufferedEnd / duration * 100 + '%';
+            audioObj.addEventListener('progress', function () {            
+                var percentage = this.buffered.length ? this.buffered.end(this.buffered.length - 1) / this.duration : 0;
+                loadedBar.style.width = percentage * 100 + '%';
+                document.querySelector('#test').innerHTML = percentage;
             }, false);
                 
 
             audioObj.addEventListener('timeupdate', function () {
                 var duration = audioObj.duration,
                     currentX = audioObj.currentTime / duration * 100;
-
-                currentX = tool.limitX(currentX);
                 progressBtn.style.left = currentX + '%';
             }, false);     
         },
@@ -113,7 +110,6 @@ function YPlayer(config) {
                     if (e.target.className.indexOf('draggable') > -1) {
                         dragging = e.target;
                         diffX = tool.getElementLeft(playedBarObj);
-                        // console.dir(e.touches[0]);
                     }
                     
                 }, false);
@@ -163,7 +159,7 @@ function YPlayer(config) {
         	                     '<img src="' + setting.playIcon + '" width="100%"></img>' +
                             '</div>' +
                             '<div class="yplayer-bar">' +
-                                 '<div class="yplayer-loaded" style="width: 0;"></div>' +
+                                 '<div class="yplayer-loaded" style="width: 0%;"></div>' +
                                  '<div class="yplayer-played draggable" style="left: 0%;"><span class="yplayer-thumb"></span></div>' +   
                             '</div>' +
                             '<div class="yplayer-time"><span class="yplayer-sTime">00:00</span>&#47;<span class="yplayer-etime">00:00</span></div>' +
@@ -195,15 +191,14 @@ function YPlayer(config) {
         	}
         };
 
-        audio.preload = config.preload
+        audio.preload = config.preload;
 
-        audio.addEventListener('canplay', function () {
-            methods.formatTime(audio.duration, allTimeText);
-            methods.setCurrTime(audio, currTimeText);
-            methods.setFeedback(audio, loadedBar, progressBtn);
-            playedBar.addEventListener('click', function (e) {methods.playedBarContro(e, audio, playedBar);});
-            methods.dragBar(audio, playedBar, progressBtn);
-        }, false);
+        audio.addEventListener('durationchange', function () {methods.formatTime(audio.duration, allTimeText);}, false)
+        
+        methods.setCurrTime(audio, currTimeText);
+        methods.setFeedback(audio, loadedBar, progressBtn);
+        playedBar.addEventListener('click', function (e) {methods.playedBarContro(e, audio, playedBar);});
+        methods.dragBar(audio, playedBar, progressBtn);
 
 	};
 }
