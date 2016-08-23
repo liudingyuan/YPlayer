@@ -1,21 +1,30 @@
 {
-  "name": "ldy",
+  "name": "yplayer",
   "version": "1.0.0",
-  "description": "",
-  "main": "",
-  "dependencies": {
-    "gulp-livereload": "^3.8.1",
-    "gulp": "^3.9.1"
-  },
-  "devDependencies": {
-    "connect": "^3.4.1",
-    "gulp": "^3.9.1",
-    "gulp-livereload": "^3.8.1",
-    "serve-static": "^1.11.1"
-  },
+  "description": "a  music player",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "webpack-dev-server --hot --inline"
   },
-  "author": "",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liudingyuan/YPlayer.git"
+  },
+  "author": "ldy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/liudingyuan/YPlayer/issues"
+  },
+  "homepage": "https://github.com/liudingyuan/YPlayer#readme",
+  "devDependencies": {
+    "babel-core": "^6.13.2",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.13.2",
+    "css-loader": "^0.23.1",
+    "node-sass": "^3.8.0",
+    "sass-loader": "^4.0.0",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.15.0"
+  }
 }
