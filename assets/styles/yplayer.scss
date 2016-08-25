@@ -1,0 +1,106 @@
+.yplayer-container {
+	display: -webkit-flex;
+	display: flex;
+	box-shadow: 0 0 3px #bbb;
+	border-radius: 5px;
+	width: 100%;
+	min-width: 320px;
+
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+		outline: 0;
+	}
+
+	.yplayer-button-wrap {
+		width: 80px;
+		height: 80px;
+
+		button {
+			position: relative;
+			top: 50%;
+			left: 50%;
+			-webkit-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+			border: 0;
+			background: transparent;
+			width: 32px;
+			height: 32px;
+			cursor: pointer;
+		}
+	}
+
+	.yplayer-mid {
+		flex-grow: 1;
+		padding-bottom: .5em;
+
+		.yplayer-info {
+			height: 50%;
+		}
+
+		.yplayer-bar-wrap {
+			position: relative;
+			height: 50%;
+
+			.yplayer-bar {
+				position: absolute;
+				bottom: 10px;
+				background:#eee;
+				width: 100%;
+				height: 2px;
+			}
+
+			.yplayer-dot {
+				position: absolute;
+				bottom: 0;
+				-webkit-transform: translate(-50%,50%);
+				transform: translate(-50%,50%);
+				display: block;
+				border-radius: 50%;
+				width: 15px;
+				height: 15px;
+				background:#eee;
+			}
+		}
+	}
+
+	.yplayer-item {
+		display: -webkit-flex;
+		display: flex;
+		justify-content: flex-start;
+		align-items: flex-end;
+		padding: .5em;
+
+		button {
+            border: 0;
+            background:transparent;
+            cursor: pointer;
+		}
+
+		.yplayer-time {
+			display: inline-block;
+			margin: 0 .25em;
+			height: 20px;
+		}
+
+		.yplayer-volume-wrap {
+			position: relative;
+			margin: 0 .25em;
+
+			.yplayer-volume-bar {
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                -webkit-transform: translateX(-100%);
+                transform: translateX(-100%);
+                background:#eee;
+                width: 4px;
+                height: 35px;
+
+			}
+		}
+
+		.yplayer-loop-button {margin: 0 .25em;}
+	}
+}

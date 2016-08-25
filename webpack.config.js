@@ -1,7 +1,7 @@
 module.exports = {
 	entry: './assets/scripts/main.js',
 	output: {
-		path: './dist',
+		path: './',
 		filename: 'build.js'
 	},
 	module: {
@@ -19,5 +19,11 @@ module.exports = {
             	}
             }
 		]
+	},
+	devServer: {
+		historyApiFallback: true,
+		hot: true,
+		inline: true,
+		progress: true
 	}
 };
