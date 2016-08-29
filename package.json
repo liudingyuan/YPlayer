@@ -4,7 +4,8 @@
   "description": "a  music player",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server --hot --inline"
+    "dev": "webpack-dev-server --hot --inline",
+    "build": "webpack --progress --profile --color --display-modules"
   },
   "repository": {
     "type": "git",

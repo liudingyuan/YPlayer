@@ -12,6 +12,10 @@
 		box-sizing: border-box;
 		outline: 0;
 		font-family: Arial, sans-serif;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+        user-select: none;
 	}
 
 	.yplayer-button-wrap {
@@ -46,9 +50,11 @@
 
 		.yplayer-info {
 			height: 50%;
+			white-space: nowrap;
+			text-overflow: ellipsis;
 
-			.yplayer-music-name {font-weight: bold;}
-			.yplayer-music-author {display: block;font-size:.8em;line-height: 2em;color: #ccc;}
+			.yplayer-music-name {display: block;font-weight: bold;}
+			.yplayer-music-author {display: block;font-size:.7em;color: #ccc;}
 		}
 
 		.yplayer-bar-wrap {
@@ -61,6 +67,7 @@
 				background:#eee;
 				width: 100%;
 				height: 2px;
+				cursor: pointer;
 
 				.yplayer-loaded {
 					position: absolute;
@@ -112,19 +119,34 @@
 			position: relative;
 			margin: 0 .25em;
 
-			.yplayer-volume-bar {
-                position: absolute;
-                bottom: 100%;
-                left: 50%;
-                -webkit-transform: translateX(-100%);
-                transform: translateX(-100%);
-                background:#eee;
-                width: 4px;
-                height: 35px;
+			.yplayer-volume-bar-wrap {
+				position: absolute;
+				bottom: 100%;
+				-webkit-transform: rotate(180deg);
+                transform: rotate(180deg);
+				padding: 0 6px;
+				width: 16px;
+				height: 35px;
+				visibility: hidden;
 
+				.yplayer-volume-bar {                   
+                    width: 100%;
+                    height: 100%;
+                    background-color: #eee;
+                    cursor: pointer;
+			    }
+			} 
+
+			&:hover {
+				.yplayer-volume-bar-wrap {visibility: visible;}
+			}
+
+			.yplayer-volume {
+				background-color: #e67e22;
 			}
 		}
 
 		.yplayer-loop-button {margin: 0 .25em;}
+		.yplayer-noloop { .yplayer-fill {fill: #eee;}}
 	}
 }

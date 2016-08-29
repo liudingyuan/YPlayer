@@ -1,8 +1,12 @@
+var webpack = require('webpack');
+
 module.exports = {
 	entry: './assets/scripts/main.js',
 	output: {
-		path: './',
-		filename: 'build.js'
+		path: './dist',
+		filename: 'YPlayer.min.js',
+		libraryTarget: 'umd',
+		umdNamedDefine: true
 	},
 	module: {
 		loaders: [
@@ -20,7 +24,15 @@ module.exports = {
             }
 		]
 	},
+	plugins: [
+        new webpack.optimize.UglifyJsPlugin({
+        	compress: {
+        		warnings: false
+        	}
+        })
+	],
 	devServer: {
+		publicPath: '/dist/',
 		historyApiFallback: true,
 		hot: true,
 		inline: true,
