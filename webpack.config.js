@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 
 module.exports = {
-	entry: './assets/scripts/main.js',
+	entry: './assets/scripts/YPlayer.js',
 	output: {
 		path: './dist',
 		filename: 'YPlayer.min.js',
