@@ -16,6 +16,7 @@
 		-moz-user-select: none;
 		-ms-user-select: none;
         user-select: none;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
 	}
 
 	.yplayer-button-wrap {
@@ -47,6 +48,7 @@
 	.yplayer-mid {
 		flex-grow: 1;
 		padding: .5em;
+		height: 80px;
 
 		.yplayer-info {
 			height: 50%;
